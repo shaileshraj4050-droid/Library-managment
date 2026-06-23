@@ -1,0 +1,108 @@
+from datetime import datetime, timedelta
+
+# Dictionary to store books
+library = {
+    "101": {"title": "Python Basics", "available": True, "issued_to": None, "issue_date": None, "days": 0},
+    "102": {"title": "Data Structures", "available": True, "issued_to": None, "issue_date": None, "days": 0},
+    "103": {"title": "AI Introduction", "available": True, "issued_to": None, "issue_date": None, "days": 0}
+}
+
+# Function to display books
+def display_books():
+    print("\n📚 Available Books:")
+    for book_id, info in library.items():
+        status = "Available" if info["available"] else f"Issued to {info['issued_to']}"
+        print(f"ID: {book_id} | Title: {info['title']} | Status: {status}")
+
+# Function to issue a book
+def issue_book():
+    book_id = input("\nEnter Book ID to issue: ")
+    
+    if book_id in library:
+        book = library[book_id]
+        
+        if book["available"]:
+            name = input("Enter student name: ")
+            days = int(input("Enter number of days to issue: "))
+            
+            book["available"] = False
+            book["issued_to"] = name
+            book["issue_date"] = datetime.now()
+            book["days"] = days
+            
+            print(f"\n✅ Book issued successfully to {name}")
+            print(f"Return within {days} days to avoid fine.")
+        else:
+            print("\n❌ Book is already issued.")
+    else:
+        print("\n❌ Invalid Book ID.")
+
+# Function to calculate fine
+def calculate_fine(late_days):
+    fine = 0
+    for i in range(1, late_days + 1):
+        fine += 10 * i   # progressive fine
+    return fine
+
+# Function to return book
+def return_book():
+    book_id = input("\nEnter Book ID to return: ")
+    
+    if book_id in library:
+        book = library[book_id]
+        
+        if not book["available"]:
+            return_date = datetime.now()
+            issue_date = book["issue_date"]
+            allowed_days = book["days"]
+            
+            actual_days = (return_date - issue_date).days
+            
+            print(f"\n📅 Issued for: {allowed_days} days")
+            print(f"📅 Used for: {actual_days} days")
+            
+            if actual_days > allowed_days:
+                late_days = actual_days - allowed_days
+                fine = calculate_fine(late_days)
+                
+                print(f"\n⚠️ Late by {late_days} days")
+                print(f"💰 Fine to be paid: Rs {fine}")
+            else:
+                print("\n✅ Book returned on time. No fine.")
+            
+            # Reset book status
+            book["available"] = True
+            book["issued_to"] = None
+            book["issue_date"] = None
+            book["days"] = 0
+            
+        else:
+            print("\n❌ This book was not issued.")
+    else:
+        print("\n❌ Invalid Book ID.")
+
+# Main menu
+def menu():
+    while True:
+        print("\n====== 📖 LIBRARY MENU ======")
+        print("1. View Books")
+        print("2. Issue Book")
+        print("3. Return Book")
+        print("4. Exit")
+        
+        choice = input("Enter your choice (1-4): ")
+        
+        if choice == "1":
+            display_books()
+        elif choice == "2":
+            issue_book()
+        elif choice == "3":
+            return_book()
+        elif choice == "4":
+            print("\n👋 Exiting... Thank you!")
+            break
+        else:
+            print("\n❌ Invalid choice. Try again.")
+
+# Run program
+menu()
